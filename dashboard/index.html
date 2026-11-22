@@ -3,12 +3,78 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied value</title>
+<link rel="icon" href="data:,">
+<title>Token Radar — pre-token protocols ranked by implied launch value</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<a class="skip" href="#board">Skip to the board</a>
-<main id="board" tabindex="-1" aria-busy="true"></main>
+<a class="skip" href="#boardwrap">Skip to the board</a>
+<header class="masthead">
+  <div class="masthead-top">
+    <p class="eyebrow">TOKEN RADAR · <span id="asof">—</span></p>
+    <h1>What would a launch be worth?</h1>
+    <p class="lede">Every protocol DefiLlama tracks, ranked by what its token would be worth if the protocol's record stayed as it is. A protocol is listed as <em>recording no token</em> — never as having none: the record is not proof. The board covers the house watchlist of 40 and the strongest pre-token protocols below it.</p>
+    <p class="meta" id="meta">—</p>
+  </div>
+  <section class="model" aria-label="The model">
+    <h2>Model radar-2</h2>
+    <p class="formula">implied = TVL × 0.25 × (1 + clamp(7d change, −80%, +150%) × 0.6) × (0.65 + min(age, 1095d) ÷ 1095 × 0.35) × youth × chains × sector</p>
+    <p class="modelnote">Youth is 0.85 under 90 days, else 1. Chains add 2% per extra chain, at most four. Sector: RWA 1.15, Risk Curators / Capital Allocators 1.10, Yield / Basis 1.05, Derivatives 0.95, else 1.00. No protocol name is special-cased. Change the sliders and the board re-ranks live.</p>
+    <div class="sandbox" id="sandbox">
+      <label>Base multiple <output id="out-base">0.25</output><input id="in-base" type="range" min="0.1" max="0.5" step="0.01" value="0.25"></label>
+      <label>Growth weight <output id="out-growth">0.60</output><input id="in-growth" type="range" min="0" max="1" step="0.05" value="0.6"></label>
+      <label>Maturity floor <output id="out-mat">0.65</output><input id="in-mat" type="range" min="0.5" max="0.8" step="0.01" value="0.65"></label>
+      <button id="sandbox-reset" type="button">Reset model</button>
+    </div>
+    <p class="sandboxnote" id="sandboxnote">Showing the published model.</p>
+  </section>
+</header>
+<main id="boardwrap">
+  <div class="tabs" role="tablist" aria-label="Board views">
+    <button id="tab-pre" role="tab" aria-selected="true" type="button">Pre-token board</button>
+    <button id="tab-live" role="tab" aria-selected="false" type="button">Live token</button>
+  </div>
+  <div class="controls">
+    <label class="search">Search <input id="q" type="search" placeholder="Name or slug…" autocomplete="off"></label>
+    <label>Category <select id="cat"><option value="all">All categories</option></select></label>
+    <label>Chain <select id="chain"><option value="all">All chains</option></select></label>
+    <label class="check"><input id="watchonly" type="checkbox"> Watchlist only</label>
+    <label>Sort <select id="sort">
+      <option value="implied">Implied value</option>
+      <option value="tvl">TVL</option>
+      <option value="growth">7d change</option>
+      <option value="age">Age</option>
+      <option value="name">Name</option>
+    </select></label>
+  </div>
+  <p class="count" id="count">—</p>
+  <div class="tablewrap">
+    <table id="board">
+      <thead><tr>
+        <th data-sort="rank">#</th><th data-sort="name">Protocol</th><th data-sort="category">Category</th>
+        <th>Chains</th><th data-sort="tvl">TVL</th><th data-sort="growth">7d</th><th data-sort="age">Age</th>
+        <th data-sort="implied">Implied value</th><th class="barhead">Share</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="empty" hidden>No protocol matches that filter. <button id="clear" type="button">Clear filters</button></p>
+  </div>
+  <div class="tablewrap" id="livewrap" hidden>
+    <table id="live">
+      <thead><tr><th>#</th><th>Protocol</th><th>Category</th><th>Chains</th><th>TVL</th><th>Market cap</th><th>7d</th></tr></thead>
+      <tbody id="liverows"></tbody>
+    </table>
+    <p class="livenote">These already trade, so the board shows the market's own value, not a model's. They are set aside from the ranking.</p>
+  </div>
+</main>
+<dialog id="detail" aria-label="Protocol detail">
+  <form method="dialog"><button class="close" value="close" aria-label="Close">×</button></form>
+  <div id="detailbody"></div>
+</dialog>
+<footer>
+  <p>Snapshot: <span id="src">—</span></p>
+  <p>A board's implied value is this entry's own claim, never make.fun's. It does not predict whether or when a token is issued. Farm plans are a starting point: check the protocol's own pages before you move money.</p>
+</footer>
 <script src="../data.js"></script>
 <script src="app.js"></script>
 </body>
